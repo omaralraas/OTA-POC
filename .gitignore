@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code / IDEs
+.vscode/
+.idea/
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# NOTE: Our generated academic artifacts (*.csv, *.png, *.json) are intentionally NOT ignored, 
+# as they provide the empirical proof for the research paper.
