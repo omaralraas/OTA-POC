@@ -126,4 +126,14 @@ Mobility Ecosystems: A Safe Testbed and Governance to Engineering Controls,"
 Canadian University Dubai, 2025.
 ```
 
+---
+
+## Future Work & Extensibility
+
+This Proof of Concept currently implements a static policy-violating signing scenario. Future enhancements to the testbed may include:
+
+- **Network-Level Adversaries**: Incorporating probability models for Wi-Fi/Cellular interception prior to the OTA gateway.
+- **Dynamic Policy Switching**: Allowing the simulator to upgrade its policy (e.g., P1 to P2) mid-fleet rollout.
+- **Hardware-in-the-Loop (HIL) Integration**: Migrating the `ECU` class to interface with physical CAN bus hardware for hybrid simulations.
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
