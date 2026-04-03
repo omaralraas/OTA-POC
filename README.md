@@ -4,6 +4,9 @@
 
 This directory contains the executable Proof of Concept (PoC) for the academic research paper:
 
+## Repository Metadata
+*Note for repo owner: Please set the following GitHub topics for this repository: `ota-security`, `automotive-cybersecurity`, `monte-carlo-simulation`, `uptane`, `iso-sae-21434`, `unece-r155`, `python`, `smart-mobility`.*
+
 > *"Measuring OTA Update-Channel Compromise Risk in Smart Mobility Ecosystems:
 > A Safe Testbed and Governance to Engineering Controls."*
 > **Omar Alraas & Mohammad Thabet** — Canadian University Dubai, 2025.

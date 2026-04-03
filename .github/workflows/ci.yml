@@ -31,4 +31,18 @@ jobs:
       run: pytest tests/ -v
 
     - name: Run smoke simulation (small fleet)
-      run: python generate_metrics.py --runs 10 --fleet-size 1000
+      run: python generate_metrics.py --runs 10 --fleet-size 1000 --ablation
+
+    - name: Assert output CSVs
+      run: |
+        python -c "
+        import pandas as pd, sys
+        df = pd.read_csv('simulation_metrics.csv')
+        required = {'Policy','Bypass %','Median TTD (h)','P95 TTD (h)',
+                    'E[Impact]','P95 Impact | Success','Rollback Safety %'}
+        missing = required - set(df.columns)
+        if missing: sys.exit(f'Missing columns: {missing}')
+        print('simulation_metrics.csv OK')
+        abl = pd.read_csv('ablation_results.csv')
+        print('ablation_results.csv OK')
+        "
