@@ -219,6 +219,7 @@ def run_ablations(fleet_size: int = 50000, runs: int = 500,
     for cfg in ABLATIONS:
         impacts = []
         ttds    = []
+        bypass_pcts = []
 
         for i in tqdm(range(runs), desc=cfg.name):
             sim = OTASimulator(
@@ -233,13 +234,25 @@ def run_ablations(fleet_size: int = 50000, runs: int = 500,
             impacts.append(stats['impacted_endpoints'])
             ttds.append(stats['ttd_hours'])
 
+            compromised    = [ecu for ecu in sim.fleet if ecu.compromised]
+            total_deployed = sum(
+                1 for ecu in sim.fleet
+                if ecu.active_version == malicious_artifact['version']
+                   or ecu.compromised
+            )
+            bypass_pct = (
+                len(compromised) / total_deployed * 100
+                if total_deployed > 0 else 0.0
+            )
+            bypass_pcts.append(bypass_pct)
+
             if i >= min_runs and check_convergence(impacts):
                 print(f"  '{cfg.name}' converged after {i + 1} iterations.")
                 break
 
         results.append({
             "Ablation":           cfg.name,
-            "Bypass %":           "see baseline",
+            "Bypass %":           round(pd.Series(bypass_pcts).mean(), 2),
             "Median TTD (h)":     round(pd.Series(ttds).median(), 1),
             "E[Impact] (50k)":    round(pd.Series(impacts).mean()),
             "P95 Impact | Success": round(pd.Series(impacts).quantile(0.95)),
