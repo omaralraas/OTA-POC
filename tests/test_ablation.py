@@ -19,6 +19,7 @@ def test_ablation_no_staging_higher_blast_radius():
     artifact = make_artifact()
     
     sim_baseline = OTASimulator(fleet_size=1000, policy='P2_Layered_Fleet', seed=42)
+    sim_baseline.canary_fraction = 0.01 # Force exact 1% canary to prevent beta-distribution test flakes
     stats_baseline = sim_baseline.run_simulation(artifact, max_hours=144)
     
     sim_no_staging = OTASimulator(fleet_size=1000, policy='P2_Layered_Fleet', seed=42, override_staging=False)
