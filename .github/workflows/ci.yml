@@ -35,7 +35,7 @@ jobs:
 
     - name: Assert output CSVs
       run: |
-        python -c "
+        cat << 'EOF' > assert_csvs.py
         import pandas as pd, sys
         df = pd.read_csv('simulation_metrics.csv')
         required = {'Policy','Bypass %','Median TTD (h)','P95 TTD (h)',
@@ -45,4 +45,5 @@ jobs:
         print('simulation_metrics.csv OK')
         abl = pd.read_csv('ablation_results.csv')
         print('ablation_results.csv OK')
-        "
+        EOF
+        python assert_csvs.py
