@@ -9,16 +9,22 @@ Contributions that improve simulation fidelity, reproducibility, or documentatio
 ## How to Contribute
 
 1. Fork the repository and create a feature branch from `main`.
-2. Make your changes with clear commit messages following the format used in this repo.
-3. Run the test suite:
+2. Set up a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+3. Make your changes with clear commit messages following the format used in this repo.
+4. Run the test suite:
    ```bash
    pytest tests/ -v
    ```
-4. Run a smoke simulation to confirm no regressions:
+5. Run a smoke simulation to confirm no regressions:
    ```bash
    python generate_metrics.py --runs 10 --fleet-size 1000
    ```
-5. Open a pull request describing what you changed and why.
+6. Open a pull request describing what you changed and why.
 
 ## Code Standards
 
