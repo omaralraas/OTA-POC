@@ -1,6 +1,6 @@
 [
   {
-    "timestamp": "2026-04-04T01:53:44.926110Z",
+    "timestamp": "2026-04-04T01:59:17.092146Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_7",
     "component_id": "ECU_GENERIC",
@@ -15,7 +15,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926128Z",
+    "timestamp": "2026-04-04T01:59:17.092170Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_7",
     "component_id": "ECU_GENERIC",
@@ -31,7 +31,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926137Z",
+    "timestamp": "2026-04-04T01:59:17.092182Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_7",
     "component_id": "ECU_GENERIC",
@@ -46,7 +46,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926143Z",
+    "timestamp": "2026-04-04T01:59:17.092190Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_7",
     "component_id": "ECU_GENERIC",
@@ -62,7 +62,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926159Z",
+    "timestamp": "2026-04-04T01:59:17.092212Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_2",
     "component_id": "ECU_GENERIC",
@@ -77,7 +77,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926165Z",
+    "timestamp": "2026-04-04T01:59:17.092221Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_2",
     "component_id": "ECU_GENERIC",
@@ -93,7 +93,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926175Z",
+    "timestamp": "2026-04-04T01:59:17.092232Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_2",
     "component_id": "ECU_GENERIC",
@@ -108,7 +108,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926180Z",
+    "timestamp": "2026-04-04T01:59:17.092240Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_2",
     "component_id": "ECU_GENERIC",
@@ -124,7 +124,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926191Z",
+    "timestamp": "2026-04-04T01:59:17.092257Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_5",
     "component_id": "ECU_GENERIC",
@@ -139,7 +139,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926196Z",
+    "timestamp": "2026-04-04T01:59:17.092264Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_5",
     "component_id": "ECU_GENERIC",
@@ -155,7 +155,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926201Z",
+    "timestamp": "2026-04-04T01:59:17.092271Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_5",
     "component_id": "ECU_GENERIC",
@@ -170,7 +170,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926205Z",
+    "timestamp": "2026-04-04T01:59:17.092277Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_5",
     "component_id": "ECU_GENERIC",
@@ -186,7 +186,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926214Z",
+    "timestamp": "2026-04-04T01:59:17.092290Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_6",
     "component_id": "ECU_GENERIC",
@@ -201,7 +201,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926218Z",
+    "timestamp": "2026-04-04T01:59:17.092298Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_6",
     "component_id": "ECU_GENERIC",
@@ -217,7 +217,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926222Z",
+    "timestamp": "2026-04-04T01:59:17.092305Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_6",
     "component_id": "ECU_GENERIC",
@@ -232,7 +232,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926226Z",
+    "timestamp": "2026-04-04T01:59:17.092313Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_6",
     "component_id": "ECU_GENERIC",
@@ -248,7 +248,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926236Z",
+    "timestamp": "2026-04-04T01:59:17.092330Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_0",
     "component_id": "ECU_GENERIC",
@@ -263,7 +263,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926241Z",
+    "timestamp": "2026-04-04T01:59:17.092338Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_0",
     "component_id": "ECU_GENERIC",
@@ -279,7 +279,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926245Z",
+    "timestamp": "2026-04-04T01:59:17.092346Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_0",
     "component_id": "ECU_GENERIC",
@@ -294,7 +294,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926249Z",
+    "timestamp": "2026-04-04T01:59:17.092355Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_0",
     "component_id": "ECU_GENERIC",
@@ -310,7 +310,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926259Z",
+    "timestamp": "2026-04-04T01:59:17.092372Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_3",
     "component_id": "ECU_GENERIC",
@@ -325,7 +325,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926263Z",
+    "timestamp": "2026-04-04T01:59:17.092380Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_3",
     "component_id": "ECU_GENERIC",
@@ -341,7 +341,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926267Z",
+    "timestamp": "2026-04-04T01:59:17.092387Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_3",
     "component_id": "ECU_GENERIC",
@@ -356,7 +356,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926271Z",
+    "timestamp": "2026-04-04T01:59:17.092394Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_3",
     "component_id": "ECU_GENERIC",
@@ -372,7 +372,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926278Z",
+    "timestamp": "2026-04-04T01:59:17.092408Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_4",
     "component_id": "ECU_GENERIC",
@@ -387,7 +387,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926282Z",
+    "timestamp": "2026-04-04T01:59:17.092416Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_4",
     "component_id": "ECU_GENERIC",
@@ -403,7 +403,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926288Z",
+    "timestamp": "2026-04-04T01:59:17.092427Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_4",
     "component_id": "ECU_GENERIC",
@@ -418,7 +418,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926292Z",
+    "timestamp": "2026-04-04T01:59:17.092434Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_4",
     "component_id": "ECU_GENERIC",
@@ -434,7 +434,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926300Z",
+    "timestamp": "2026-04-04T01:59:17.092448Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_9",
     "component_id": "ECU_GENERIC",
@@ -449,7 +449,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926304Z",
+    "timestamp": "2026-04-04T01:59:17.092456Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_9",
     "component_id": "ECU_GENERIC",
@@ -465,7 +465,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926307Z",
+    "timestamp": "2026-04-04T01:59:17.092463Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_9",
     "component_id": "ECU_GENERIC",
@@ -480,7 +480,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926311Z",
+    "timestamp": "2026-04-04T01:59:17.092471Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_9",
     "component_id": "ECU_GENERIC",
@@ -496,7 +496,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926322Z",
+    "timestamp": "2026-04-04T01:59:17.092487Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_8",
     "component_id": "ECU_GENERIC",
@@ -511,7 +511,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926326Z",
+    "timestamp": "2026-04-04T01:59:17.092494Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_8",
     "component_id": "ECU_GENERIC",
@@ -527,7 +527,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926330Z",
+    "timestamp": "2026-04-04T01:59:17.092501Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_8",
     "component_id": "ECU_GENERIC",
@@ -542,7 +542,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926334Z",
+    "timestamp": "2026-04-04T01:59:17.092509Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_8",
     "component_id": "ECU_GENERIC",
@@ -558,7 +558,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926344Z",
+    "timestamp": "2026-04-04T01:59:17.092528Z",
     "event_type": "DOWNLOAD",
     "endpoint_id": "ECU_1",
     "component_id": "ECU_GENERIC",
@@ -573,7 +573,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926348Z",
+    "timestamp": "2026-04-04T01:59:17.092537Z",
     "event_type": "VERIFY_SUCCESS",
     "endpoint_id": "ECU_1",
     "component_id": "ECU_GENERIC",
@@ -589,7 +589,7 @@
     "hash_ok": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926351Z",
+    "timestamp": "2026-04-04T01:59:17.092544Z",
     "event_type": "INSTALL_SUCCESS",
     "endpoint_id": "ECU_1",
     "component_id": "ECU_GENERIC",
@@ -604,7 +604,7 @@
     "detection_flags": []
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926355Z",
+    "timestamp": "2026-04-04T01:59:17.092551Z",
     "event_type": "BOOT_DEGRADED",
     "endpoint_id": "ECU_1",
     "component_id": "ECU_GENERIC",
@@ -620,7 +620,7 @@
     "compromised": true
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926437Z",
+    "timestamp": "2026-04-04T01:59:17.092709Z",
     "event_type": "INCIDENT_ALERT",
     "endpoint_id": "SYSTEM",
     "component_id": "ECU_GENERIC",
@@ -637,7 +637,7 @@
     "compromised": 10
   },
   {
-    "timestamp": "2026-04-04T01:53:44.926451Z",
+    "timestamp": "2026-04-04T01:59:17.092735Z",
     "event_type": "CONTAINMENT_FREEZE",
     "endpoint_id": "SYSTEM",
     "component_id": "ECU_GENERIC",

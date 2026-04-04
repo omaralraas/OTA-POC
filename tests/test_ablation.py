@@ -2,6 +2,8 @@
 tests/test_ablation.py — Unit tests for the ablation study logic.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from ota_poc.metrics import run_ablations
