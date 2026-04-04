@@ -114,7 +114,7 @@ def test_rollback_restores_lkg() -> None:
 
     if ecu.status == "degraded":
         initial_lkg = ecu.last_known_good_version
-        success = ecu.rollback()
+        success = ecu.rollback(rng=random.Random(99), failure_prob=0.0)
         assert success is True
         assert ecu.status == "healthy"
         assert ecu.active_version == initial_lkg
@@ -184,7 +184,7 @@ def test_rollback_not_degraded_returns_false() -> None:
     log = EventLog()
     ecu = ECU("ECU_0", log)
     original_version = ecu.active_version
-    result = ecu.rollback()
+    result = ecu.rollback(rng=random.Random(0), failure_prob=0.0)
     assert result is False
     assert ecu.active_version == original_version
     assert ecu.status == "healthy"

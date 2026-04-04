@@ -4,6 +4,8 @@ Configuration constants for the OTA-POC simulation.
 All simulation parameters are centralized here for easy tuning,
 reproducibility, and ablation studies. Values are calibrated against
 ENISA reports and ISO/SAE 21434 threat modeling baselines.
+
+See docs/parameter_derivation.md for the full derivation of all values.
 """
 
 # --- Beta distribution parameters for stochastic canary fraction ---
@@ -57,3 +59,12 @@ CI_Z_SCORE: float = 1.96
 # --- Simulation ---
 MAX_SIMULATION_HOURS: int = 144
 DEFAULT_VERSION: str = "v1.0"
+
+# --- Per-policy rollback failure probability ---
+# P0: No dual-partition guarantee; rollback may fail due to corrupted LKG.
+# P1: Basic A/B partition; rollback usually succeeds.
+# P2: Uptane-verified LKG with monotonic counter; near-certain rollback success.
+# See docs/parameter_derivation.md for derivation rationale.
+P0_ROLLBACK_FAILURE_PROB: float = 0.30
+P1_ROLLBACK_FAILURE_PROB: float = 0.10
+P2_ROLLBACK_FAILURE_PROB: float = 0.02

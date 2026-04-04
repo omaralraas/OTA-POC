@@ -194,13 +194,29 @@ class ECU:
 
         return True
 
-    def rollback(self) -> bool:
-        """Roll back to last known good version.
+    def rollback(self, rng: random.Random, failure_prob: float = 0.0) -> bool:
+        """Roll back to last known good version with stochastic failure.
+
+        Args:
+            rng: Instance-level random generator for reproducibility.
+            failure_prob: Probability that rollback fails (0.0-1.0).
 
         Returns:
-            True if rollback was performed, False if ECU was not degraded.
+            True if rollback succeeded, False otherwise.
         """
         if self.status == "degraded":
+            if rng.random() < failure_prob:
+                self.event_log.log(
+                    "ROLLBACK_FAIL",
+                    self.ecu_id,
+                    self.last_known_good_version,
+                    {
+                        "rollback_invoked": True,
+                        "rollback_result": "failed",
+                        "reason": "lkg_corrupted_or_partition_failure",
+                    },
+                )
+                return False
             target = self.last_known_good_version
             self.active_version = target
             self.status = "healthy"

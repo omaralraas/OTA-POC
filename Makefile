@@ -1,4 +1,4 @@
-.PHONY: install test lint typecheck security coverage clean docker-build
+.PHONY: install test lint typecheck security coverage clean docker-build verify
 
 install:
 	pip install -e ".[dev]"
@@ -32,5 +32,11 @@ docker-run:
 
 smoke:
 	python -m ota_poc.metrics --runs 10 --fleet-size 1000 --ablation
+
+# Full end-to-end verification for reviewers
+verify:
+	python -m ota_poc.metrics --runs 500 --fleet-size 50000 --seed 42 --ablation
+	python scripts/assert_csvs.py
+	python scripts/assert_readme_numbers.py
 
 ci: lint typecheck security coverage smoke

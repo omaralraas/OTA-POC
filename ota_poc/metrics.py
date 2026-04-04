@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -34,6 +35,9 @@ from ota_poc.config import (
     DEFAULT_SEED,
     MAX_SIMULATION_HOURS,
     MIN_RUNS_FOR_CONVERGENCE,
+    P0_ROLLBACK_FAILURE_PROB,
+    P1_ROLLBACK_FAILURE_PROB,
+    P2_ROLLBACK_FAILURE_PROB,
     PLOT_FIGSIZE,
 )
 from ota_poc.simulator import OTASimulator
@@ -70,46 +74,41 @@ def check_convergence(
     return bool(abs(recent - prior) / prior < threshold)
 
 
-def _compute_bypass_pct(fleet: list[Any], artifact: dict[str, Any]) -> float:
-    """Compute the percentage of deployed ECUs that were compromised.
+def _compute_bypass_pct(fleet: list[Any], fleet_size: int) -> float:
+    """Compute the percentage of the entire fleet that was compromised.
+
+    This measures fleet-wide blast radius, not just among deployed ECUs.
 
     Args:
         fleet: List of ECU objects.
-        artifact: The artifact dict for version comparison.
+        fleet_size: Total fleet size (denominator).
 
     Returns:
         Bypass percentage (0.0-100.0).
     """
-    compromised = [ecu for ecu in fleet if ecu.compromised]
-    total_deployed = sum(
-        1
-        for ecu in fleet
-        if ecu.active_version == artifact["version"] or ecu.compromised
-    )
-    if total_deployed == 0:
+    compromised = sum(1 for ecu in fleet if ecu.compromised)
+    if fleet_size == 0:
         return 0.0
-    return len(compromised) / total_deployed * 100
+    return compromised / fleet_size * 100
 
 
-def _can_rollback(ecu: Any) -> bool:
-    """Check if an ECU can be safely rolled back without mutating state.
-
-    Args:
-        ecu: An ECU object.
-
-    Returns:
-        True if the ECU is degraded and has a valid last known good version.
-    """
-    return ecu.status == "degraded" and bool(ecu.last_known_good_version)
+_ROLLBACK_FAILURE_PROBS: dict[str, float] = {
+    "P0_Minimal": P0_ROLLBACK_FAILURE_PROB,
+    "P1_Secure_OTA": P1_ROLLBACK_FAILURE_PROB,
+    "P2_Layered_Fleet": P2_ROLLBACK_FAILURE_PROB,
+}
 
 
-def _compute_rollback_rate(fleet: list[Any]) -> float:
+def _compute_rollback_rate(fleet: list[Any], policy: str, rng: random.Random) -> float:
     """Compute the percentage of compromised ECUs that can be safely rolled back.
 
-    This function does NOT mutate ECU state — it only checks eligibility.
+    Uses per-policy stochastic failure probabilities to model real-world
+    rollback reliability differences (dual-partition, Uptane verification, etc.).
 
     Args:
         fleet: List of ECU objects.
+        policy: Policy identifier for failure probability lookup.
+        rng: Random generator for stochastic rollback outcomes.
 
     Returns:
         Rollback safety percentage (0.0-100.0).
@@ -117,8 +116,9 @@ def _compute_rollback_rate(fleet: list[Any]) -> float:
     compromised = [ecu for ecu in fleet if ecu.compromised]
     if not compromised:
         return 100.0
-    can_rollback = sum(1 for ecu in compromised if _can_rollback(ecu))
-    return can_rollback / len(compromised) * 100
+    failure_prob = _ROLLBACK_FAILURE_PROBS.get(policy, P0_ROLLBACK_FAILURE_PROB)
+    successes = sum(1 for ecu in compromised if ecu.rollback(rng, failure_prob))
+    return successes / len(compromised) * 100
 
 
 def _compute_confidence_interval(values: list[float]) -> tuple[float, float]:
@@ -183,8 +183,8 @@ def run_scenarios(
             ttds.append(stats["ttd_hours"])
             impacts.append(stats["impacted_endpoints"])
 
-            bypass_pcts.append(_compute_bypass_pct(sim.fleet, MALICIOUS_ARTIFACT))
-            rollback_rates.append(_compute_rollback_rate(sim.fleet))
+            bypass_pcts.append(_compute_bypass_pct(sim.fleet, fleet_size))
+            rollback_rates.append(_compute_rollback_rate(sim.fleet, sim.policy, sim.rng))
 
             if i == 0:
                 with open(f"{policy}_sample_event_log.json", "w", encoding="utf-8") as f:
@@ -319,8 +319,8 @@ def run_ablations(
             impacts.append(stats["impacted_endpoints"])
             ttds.append(stats["ttd_hours"])
 
-            bypass_pcts.append(_compute_bypass_pct(sim.fleet, MALICIOUS_ARTIFACT))
-            rollback_rates.append(_compute_rollback_rate(sim.fleet))
+            bypass_pcts.append(_compute_bypass_pct(sim.fleet, fleet_size))
+            rollback_rates.append(_compute_rollback_rate(sim.fleet, sim.policy, sim.rng))
 
             if i >= min_runs and check_convergence(impacts):
                 print(f"  '{cfg.name}' converged after {i + 1} iterations.")

@@ -3,6 +3,7 @@
 [![CI](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml/badge.svg)](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-75%25-brightgreen)](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml)
 
 This repository contains the executable Proof of Concept (PoC) for the academic research paper:
 
@@ -71,9 +72,17 @@ This executes up to **500 stochastic iterations** (with adaptive P95 convergence
 
 ### What This Proves
 
-1. **P0 (Minimal Governance)**: Rapid rollout with weak telemetry detects the incident too slowly. Blast radius compromises ~28,000 endpoints before containment.
-2. **P1 (Secure OTA without Governance)**: Cryptography verifies the signature, but since the signed artifact is malicious, vehicles update successfully anyway. Blast radius remains catastrophically high.
-3. **P2 (Layered Fleet)**: Staged 1% canary rollout + transparency monitoring + incident response detects the anomaly while limited to the initial cohort. **Median blast radius ~2,112 endpoints**, **P95 worst-case ~6,828 endpoints** — an 86% reduction relative to P1.
+1. **P0 (Minimal Governance)**: Rapid rollout with weak telemetry detects the incident too slowly. Blast radius compromises ~27,784 endpoints (55.6% of fleet) before containment.
+2. **P1 (Secure OTA without Governance)**: Cryptography verifies the signature, but since the signed artifact is malicious, vehicles update successfully anyway. Blast radius remains catastrophically high at ~23,893 endpoints (47.8% of fleet).
+3. **P2 (Layered Fleet)**: Staged 1% canary rollout + transparency monitoring + incident response detects the anomaly while limited to the initial cohort. **Median blast radius ~46 endpoints**, **P95 worst-case ~62 endpoints** — a 99.7% reduction relative to P1.
+
+> **Why are P0 and P1 so similar?**
+> This is by design. The simulated attack is a "Policy-Violating Signing Attack"
+> where the adversary has already obtained valid signing keys (insider threat /
+> supply-chain compromise). The artifact's `hash_ok=True` and `metadata_valid=True`
+> flags model this. P1's cryptographic check passes — correctly — because the
+> signature is genuine. This demonstrates that cryptography alone (P1) is
+> insufficient against key-control threats; governance controls (P2) are required.
 
 ## Validating Results
 
@@ -94,6 +103,26 @@ Run with `--ablation` to produce Table IV reproductions:
 ```bash
 python -m ota_poc.metrics --runs 500 --ablation
 ```
+
+Committed `ablation_results.csv` (seed 42, 500 runs, 50k fleet):
+
+| Ablation | Bypass % | Median TTD | E[Impact] | P95 Impact | Rollback Safety % |
+|----------|----------|------------|-----------|------------|-------------------|
+| No Staging | 1.34 | 2.0h | 668 | 709 | 98.1% |
+| No Transparency Monitor | 1.37 | 12.0h | 684 | 1,229 | 97.9% |
+| Slow Containment (12h) | 1.21 | 1.0h | 605 | 819 | 98.0% |
+
+## Canonical Results
+
+Numbers shown are from the committed `simulation_metrics.csv` and `ablation_results.csv` generated with `--runs 500 --fleet-size 50000 --seed 42`. See [docs/parameter_derivation.md](docs/parameter_derivation.md) for the derivation of all simulation parameters.
+
+Canonical simulation_metrics.csv:
+
+| Policy | Bypass % | Median TTD (h) | P95 TTD (h) | E[Impact] | P95 Impact | Rollback Safety % |
+|--------|----------|----------------|-------------|-----------|------------|-------------------|
+| P0_Minimal | 55.57 | 2.0 | 3.0 | 27,784 | 29,167 | 70.0% |
+| P1_Secure_OTA | 47.79 | 2.0 | 2.0 | 23,893 | 23,936 | 90.0% |
+| P2_Layered_Fleet | 0.09 | 1.0 | 4.0 | 46 | 62 | 97.9% |
 
 ## Alternative Scenarios
 

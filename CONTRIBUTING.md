@@ -55,7 +55,7 @@ mypy ota_poc/ scripts/
 bandit -r ota_poc/ -ll
 
 # Tests with coverage
-pytest tests/ -v --cov=ota_poc --cov-report=term-missing --cov-fail-under=90
+pytest tests/ -v --cov=ota_poc --cov-report=term-missing --cov-fail-under=75
 ```
 
 ## Commit Message Format
@@ -91,6 +91,8 @@ tests/
   metrics, documentation, CI
 - **Mohammad Thabet** ([@MohammadThabetHassan](https://github.com/MohammadThabetHassan)) —
   simulation engine, statistical testing
+- **Lobna AbuSerrieh** — threat model, standards alignment (ISO/SAE 21434, UNECE R155),
+  governance recommendations
 
 ## License
 

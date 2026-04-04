@@ -1,4 +1,4 @@
 Policy,Bypass %,Median TTD (h),P95 TTD (h),E[Impact],P95 Impact | Success,Rollback Safety %,E[Impact] 95% CI
-P0_Minimal,100.0,91.0,91.0,10,10,100.0,"[10.0, 10.0]"
-P1_Secure_OTA,100.0,91.0,91.0,8,8,100.0,"[8.0, 8.0]"
+P0_Minimal,100.0,91.0,91.0,10,10,80.0,"[10.0, 10.0]"
+P1_Secure_OTA,80.0,91.0,91.0,8,8,100.0,"[8.0, 8.0]"
 P2_Layered_Fleet,0.0,144.0,144.0,0,0,100.0,"[0.0, 0.0]"
