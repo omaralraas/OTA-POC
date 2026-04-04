@@ -28,6 +28,7 @@ dev = [
     "ruff>=0.1.0",
     "bandit>=1.7.0",
     "pandas-stubs>=2.0.0",
+    "hypothesis>=6.0",
 ]
 
 [project.scripts]
