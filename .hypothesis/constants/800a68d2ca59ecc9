@@ -1,0 +1,4 @@
+# file: /workspaces/codespaces-nextjs/OTA-POC/ota_poc/metrics.py
+# hypothesis_version: 6.151.10
+
+[0.0, 0.7, 0.95, 100.0, 100, 1000000, '--', '--ablation', '--fleet-size', '--runs', '--seed', 'Ablation', 'Bypass %', 'E[Impact]', 'E[Impact] (50k)', 'E[Impact] 95% CI', 'Est. Cost (USD)', 'Median TTD (h)', 'No Staging', 'P0_Minimal', 'P1_Secure_OTA', 'P2_Layered_Fleet', 'P95 Impact | Success', 'P95 TTD (h)', 'Policy', 'Rollback Safety %', '__main__', 'ablation_results.csv', 'blast_radius_cdf.png', 'hash_ok', 'impacted_endpoints', 'lower right', 'metadata_valid', 'step', 'store_true', 'ttd_hours', 'unsafe_payload', 'utf-8', 'v1.1_malicious', 'version', 'w']

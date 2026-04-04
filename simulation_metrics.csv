@@ -1,4 +1,4 @@
-Policy,Bypass %,Median TTD (h),P95 TTD (h),E[Impact],P95 Impact | Success,Rollback Safety %,E[Impact] 95% CI
-P0_Minimal,55.57,2.0,3.0,27784,29167,70.0,"[27571.1, 27996.8]"
-P1_Secure_OTA,47.79,2.0,2.0,23893,23936,90.0,"[23835.4, 23951.4]"
-P2_Layered_Fleet,0.09,1.0,4.0,46,62,97.9,"[41.5, 51.0]"
+Policy,Bypass %,Median TTD (h),P95 TTD (h),E[Impact],P95 Impact | Success,Rollback Safety %,E[Impact] 95% CI,Est. Cost (USD)
+P0_Minimal,55.57,2.0,3.0,27784,29167,70.0,"[27571.1, 27996.8]",$33.3M
+P1_Secure_OTA,47.79,2.0,2.0,23893,23936,90.0,"[23835.4, 23951.4]",$28.7M
+P2_Layered_Fleet,0.09,1.0,4.0,46,62,97.9,"[41.5, 51.0]","$55,451"

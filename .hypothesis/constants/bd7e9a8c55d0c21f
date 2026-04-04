@@ -1,0 +1,4 @@
+# file: /workspaces/codespaces-nextjs/OTA-POC/ota_poc/simulator.py
+# hypothesis_version: 6.151.10
+
+[-1.0, 0.0, 1.0, '+00:00', 'BOOT_DEGRADED', 'BOOT_SUCCESS', 'CAMPAIGN_001', 'CONTAINMENT_FREEZE', 'DOWNLOAD', 'ECU_GENERIC', 'INCIDENT_ALERT', 'INSTALL_SUCCESS', 'P0_Minimal', 'P1_Secure_OTA', 'P2_Layered_Fleet', 'ROLLBACK_FAIL', 'ROLLBACK_SUCCESS', 'SYSTEM', 'VERIFY_FAIL', 'VERIFY_SUCCESS', 'Z', 'artifact_hash_ok', 'blocked', 'boot_result', 'campaign_id', 'component_id', 'compromised', 'containment_time', 'crypto_verify_fail', 'degraded', 'detection_flags', 'endpoint_id', 'event_type', 'failed', 'hash_ok', 'healthy', 'hour', 'impacted_endpoints', 'install_result', 'metadata_valid', 'policy', 'reason', 'restored_to', 'rollback_invoked', 'rollback_result', 'success', 'timestamp', 'ttd_hours', 'unsafe_payload', 'version']

@@ -68,3 +68,7 @@ DEFAULT_VERSION: str = "v1.0"
 P0_ROLLBACK_FAILURE_PROB: float = 0.30
 P1_ROLLBACK_FAILURE_PROB: float = 0.10
 P2_ROLLBACK_FAILURE_PROB: float = 0.02
+
+# --- Economic impact ---
+# Source: NHTSA average ECU recall cost per vehicle ~$800-$1600 (2022)
+COST_PER_COMPROMISED_ECU_USD: float = 1_200.0

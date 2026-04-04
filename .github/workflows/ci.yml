@@ -40,7 +40,7 @@ jobs:
       run: bandit -r ota_poc/ -ll
 
     - name: Run tests with coverage
-      run: pytest tests/ -v --cov=ota_poc --cov-report=xml --cov-fail-under=75
+      run: pytest tests/ -v --cov=ota_poc --cov-report=xml --cov-fail-under=90
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

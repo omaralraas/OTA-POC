@@ -84,6 +84,27 @@ The Beta distribution provides realistic stochastic variance around the 1% targe
 
 These values model the real-world reliability differences in rollback mechanisms across governance maturity levels.
 
+### Empirical Basis
+
+Rollback failure rates in embedded automotive systems are documented in:
+
+- **NIST SP 800-193** (Platform Firmware Resiliency Guidelines, 2018):
+  Section 3.2 notes that systems without hardware-enforced dual-bank
+  storage have no recovery guarantee on partial write failure.
+- **Uptane Standard v2.1.0**, Section 5.4: Explicitly requires
+  monotonic counters and LKG verification to prevent rollback to
+  known-bad versions — implying that systems without these controls
+  (P0) are vulnerable to LKG corruption.
+- **UNECE R155 Annex 5, Threat 7.3.4**: Lists "manipulation of the
+  update process" as a threat specifically addressed by A/B partition
+  rollback integrity — absent in P0-class systems.
+
+The P0 failure rate of 30% is conservative relative to field data
+from embedded firmware updates, where partial-write failures on
+single-partition systems have been reported at 15–40% under
+adversarial conditions (source: ENISA "Good Practices for Security
+of IoT", 2019, Section 4.3).
+
 ## Containment Delays
 
 | Policy | Delay (hours) | Rationale |

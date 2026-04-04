@@ -3,7 +3,7 @@
 [![CI](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml/badge.svg)](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-75%25-brightgreen)](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml)
 
 This repository contains the executable Proof of Concept (PoC) for the academic research paper:
 
@@ -194,3 +194,4 @@ Canadian University Dubai, 2025.
 - **Cost Model**: Economic impact simulation of different blast radii
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+See [docs/AUTHORSHIP.md](docs/AUTHORSHIP.md) for the authorship statement.

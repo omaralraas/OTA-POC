@@ -1,4 +1,4 @@
-Ablation,Bypass %,Median TTD (h),E[Impact] (50k),P95 Impact | Success,Rollback Safety %,E[Impact] 95% CI
-No Staging,1.34,2.0,668,709,98.1,"[662.2, 674.5]"
-No Transparency Monitor,1.37,12.0,684,1229,97.9,"[628.2, 739.1]"
-Slow Containment (12h),1.21,1.0,605,819,98.0,"[588.8, 622.0]"
+Ablation,Bypass %,Median TTD (h),E[Impact] (50k),P95 Impact | Success,Rollback Safety %,E[Impact] 95% CI,Est. Cost (USD)
+No Staging,1.34,2.0,668,709,98.1,"[662.2, 674.5]","$802,029"
+No Transparency Monitor,1.37,12.0,684,1229,97.9,"[628.2, 739.1]","$820,391"
+Slow Containment (12h),1.21,1.0,605,819,98.0,"[588.8, 622.0]","$726,477"

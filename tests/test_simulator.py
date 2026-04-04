@@ -352,3 +352,72 @@ def test_get_detection_probability_no_monitoring_override() -> None:
         fleet_size=100, policy="P2_Layered_Fleet", seed=42, override_monitoring=False
     )
     assert sim.get_detection_probability("P2_Layered_Fleet") == pytest.approx(0.05)
+
+
+def test_rollback_dry_run_does_not_mutate() -> None:
+    """dry_run=True must not change ECU state."""
+    log = EventLog()
+    ecu = ECU("ECU_0", log)
+    rng = random.Random(0)
+    ecu.execute_ota(make_artifact(unsafe_payload=True), policy="P0_Minimal", rng=rng)
+    assert ecu.status == "degraded"
+    assert ecu.compromised is True
+    result = ecu.rollback(rng, failure_prob=0.0, dry_run=True)
+    assert result is True
+    assert ecu.status == "degraded"
+    assert ecu.compromised is True
+
+
+def test_rollback_failure_path() -> None:
+    """Rollback should fail when rng rolls below failure_prob."""
+    log = EventLog()
+    ecu = ECU("ECU_0", log)
+    rng = random.Random(0)
+    ecu.execute_ota(make_artifact(unsafe_payload=True), policy="P0_Minimal", rng=rng)
+    assert ecu.status == "degraded"
+    result = ecu.rollback(rng, failure_prob=1.0)
+    assert result is False
+    assert ecu.status == "degraded"
+    assert ecu.compromised is True
+
+
+def test_rollback_dry_run_failure() -> None:
+    """dry_run=True should return False when failure_prob is 1.0."""
+    log = EventLog()
+    ecu = ECU("ECU_0", log)
+    rng = random.Random(0)
+    ecu.execute_ota(make_artifact(unsafe_payload=True), policy="P0_Minimal", rng=rng)
+    result = ecu.rollback(rng, failure_prob=1.0, dry_run=True)
+    assert result is False
+    assert ecu.status == "degraded"
+
+
+def test_check_containment_before_detection() -> None:
+    """_check_containment should return False when detection has not fired."""
+    sim = OTASimulator(fleet_size=100, policy="P0_Minimal", seed=42)
+    artifact = make_artifact(unsafe_payload=True)
+    result = sim._check_containment(0, artifact)
+    assert result is False
+    assert sim.contained is False
+
+
+def test_check_detection_no_compromised() -> None:
+    """_check_detection should return early when no ECUs are compromised."""
+    sim = OTASimulator(fleet_size=100, policy="P0_Minimal", seed=42)
+    artifact = make_artifact(unsafe_payload=False)
+    sim._check_detection(0, artifact)
+    assert sim.detection_time < 0
+
+
+def test_bypass_pct_zero_fleet_size() -> None:
+    """_compute_bypass_pct should return 0.0 for zero fleet_size."""
+    from ota_poc.metrics import _compute_bypass_pct
+
+    pct = _compute_bypass_pct([], fleet_size=0)
+    assert pct == 0.0
+
+
+def test_unknown_policy_defaults_to_p0_detection() -> None:
+    """An unknown policy should default to P0 detection probability."""
+    sim = OTASimulator(fleet_size=100, policy="P3_Unknown", seed=42)
+    assert sim.get_detection_probability("P3_Unknown") == pytest.approx(0.05)

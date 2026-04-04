@@ -1,4 +1,4 @@
-"""Assert that README.md P2 numbers match simulation_metrics.csv within ±5%."""
+"""Assert that README.md numbers match committed CSVs within ±5%."""
 
 import csv
 import re
@@ -6,7 +6,7 @@ import sys
 
 
 def main() -> None:
-    """Validate README P2 numbers against committed CSV."""
+    """Validate README P2 and ablation numbers against committed CSVs."""
     with open("simulation_metrics.csv", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         rows = {row["Policy"]: row for row in reader}
@@ -37,26 +37,55 @@ def main() -> None:
     readme_p95 = int(p95_match.group(1).replace(",", ""))
 
     tolerance = 0.05
-    median_ok = abs(readme_median - csv_e_impact) / csv_e_impact <= tolerance
-    p95_ok = abs(readme_p95 - csv_p95_impact) / csv_p95_impact <= tolerance
-
     errors = []
-    if not median_ok:
+
+    if abs(readme_median - csv_e_impact) / csv_e_impact > tolerance:
         errors.append(
             f"README P2 median ({readme_median}) != CSV E[Impact] ({csv_e_impact:.0f})"
         )
-    if not p95_ok:
+    if abs(readme_p95 - csv_p95_impact) / csv_p95_impact > tolerance:
         errors.append(
             f"README P2 P95 ({readme_p95}) != CSV P95 Impact ({csv_p95_impact:.0f})"
         )
 
+    # --- Validate ablation table ---
+    with open("ablation_results.csv", newline="", encoding="utf-8") as f:
+        abl_rows = {row["Ablation"]: row for row in csv.DictReader(f)}
+
+    ablation_checks = [
+        ("No Staging", "No Staging"),
+        ("No Transparency Monitor", "No Transparency Monitor"),
+        ("Slow Containment (12h)", "Slow Containment (12h)"),
+    ]
+
+    for readme_label, csv_key in ablation_checks:
+        csv_row = abl_rows.get(csv_key)
+        if not csv_row:
+            print(f"Error: '{csv_key}' not found in ablation_results.csv", file=sys.stderr)
+            sys.exit(1)
+        csv_impact = float(csv_row["E[Impact] (50k)"])
+        pattern = rf"\|\s*{re.escape(readme_label)}\s*\|[^|]+\|[^|]+\|\s*([\d,]+)"
+        match = re.search(pattern, readme)
+        if not match:
+            print(
+                f"Error: Could not find '{readme_label}' row in README ablation table",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        readme_impact = int(match.group(1).replace(",", ""))
+        if abs(readme_impact - csv_impact) / max(csv_impact, 1) > tolerance:
+            errors.append(
+                f"README ablation '{readme_label}' E[Impact] ({readme_impact}) "
+                f"!= CSV ({csv_impact:.0f})"
+            )
+
     if errors:
-        print("Error: README numbers do not match CSV within ±5%:", file=sys.stderr)
+        print("Error: README numbers do not match CSVs within ±5%:", file=sys.stderr)
         for err in errors:
             print(f"  - {err}", file=sys.stderr)
         sys.exit(1)
 
-    print("README numbers match simulation_metrics.csv within ±5%.")
+    print("README numbers match committed CSVs within ±5%.")
 
 
 if __name__ == "__main__":

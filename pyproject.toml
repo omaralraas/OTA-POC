@@ -56,5 +56,5 @@ select = ["E", "F", "W", "I"]
 source = ["ota_poc"]
 
 [tool.coverage.report]
-fail_under = 75
+fail_under = 90
 show_missing = true

@@ -55,7 +55,7 @@ mypy ota_poc/ scripts/
 bandit -r ota_poc/ -ll
 
 # Tests with coverage
-pytest tests/ -v --cov=ota_poc --cov-report=term-missing --cov-fail-under=75
+pytest tests/ -v --cov=ota_poc --cov-report=term-missing --cov-fail-under=90
 ```
 
 ## Commit Message Format
@@ -86,6 +86,9 @@ tests/
 ```
 
 ## Authors
+
+See [docs/AUTHORSHIP.md](docs/AUTHORSHIP.md) for the full authorship statement
+and contribution breakdown.
 
 - **Omar Alraas** ([@omaralraas](https://github.com/omaralraas)) — repo owner,
   metrics, documentation, CI

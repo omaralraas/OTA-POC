@@ -194,45 +194,54 @@ class ECU:
 
         return True
 
-    def rollback(self, rng: random.Random, failure_prob: float = 0.0) -> bool:
+    def rollback(
+        self,
+        rng: random.Random,
+        failure_prob: float = 0.0,
+        dry_run: bool = False,
+    ) -> bool:
         """Roll back to last known good version with stochastic failure.
 
         Args:
             rng: Instance-level random generator for reproducibility.
             failure_prob: Probability that rollback fails (0.0-1.0).
+            dry_run: If True, simulate the outcome without mutating state.
 
         Returns:
-            True if rollback succeeded, False otherwise.
+            True if rollback would succeed (or succeeded), False otherwise.
         """
-        if self.status == "degraded":
-            if rng.random() < failure_prob:
-                self.event_log.log(
-                    "ROLLBACK_FAIL",
-                    self.ecu_id,
-                    self.last_known_good_version,
-                    {
-                        "rollback_invoked": True,
-                        "rollback_result": "failed",
-                        "reason": "lkg_corrupted_or_partition_failure",
-                    },
-                )
-                return False
-            target = self.last_known_good_version
-            self.active_version = target
-            self.status = "healthy"
-            self.compromised = False
+        if self.status != "degraded":
+            return False
+        would_fail = rng.random() < failure_prob
+        if dry_run:
+            return not would_fail
+        if would_fail:
             self.event_log.log(
-                "ROLLBACK_SUCCESS",
+                "ROLLBACK_FAIL",
                 self.ecu_id,
-                target,
+                self.last_known_good_version,
                 {
                     "rollback_invoked": True,
-                    "rollback_result": "success",
-                    "restored_to": target,
+                    "rollback_result": "failed",
+                    "reason": "lkg_corrupted_or_partition_failure",
                 },
             )
-            return True
-        return False
+            return False
+        target = self.last_known_good_version
+        self.active_version = target
+        self.status = "healthy"
+        self.compromised = False
+        self.event_log.log(
+            "ROLLBACK_SUCCESS",
+            self.ecu_id,
+            target,
+            {
+                "rollback_invoked": True,
+                "rollback_result": "success",
+                "restored_to": target,
+            },
+        )
+        return True
 
 
 class OTASimulator:

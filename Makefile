@@ -17,7 +17,7 @@ security:
 	bandit -r ota_poc/ -ll
 
 coverage:
-	pytest tests/ -v --cov=ota_poc --cov-report=term-missing --cov-fail-under=75
+	pytest tests/ -v --cov=ota_poc --cov-report=term-missing --cov-fail-under=90
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +

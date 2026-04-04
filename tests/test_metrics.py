@@ -24,6 +24,8 @@ from ota_poc.metrics import (
     _compute_confidence_interval,
     _compute_rollback_rate,
     check_convergence,
+    run_ablations,
+    run_scenarios,
 )
 from ota_poc.simulator import ECU, EventLog
 
@@ -267,3 +269,42 @@ def test_cli_happy_path() -> None:
     assert result.returncode == 0
     assert "Simulation Results" in result.stdout
     assert Path("simulation_metrics.csv").exists()
+
+
+def test_cli_happy_path_with_ablation() -> None:
+    """CLI should generate both CSVs when --ablation is used."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "ota_poc.metrics",
+            "--runs",
+            "2",
+            "--fleet-size",
+            "10",
+            "--ablation",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0
+    assert Path("simulation_metrics.csv").exists()
+    assert Path("ablation_results.csv").exists()
+
+
+def test_run_scenarios_produces_csv() -> None:
+    """run_scenarios should produce a valid simulation_metrics.csv."""
+    run_scenarios(fleet_size=10, runs=2, master_seed=42, min_runs=100)
+    assert Path("simulation_metrics.csv").exists()
+    df = __import__("pandas").read_csv("simulation_metrics.csv")
+    assert len(df) == 3
+    assert set(df["Policy"]) == {"P0_Minimal", "P1_Secure_OTA", "P2_Layered_Fleet"}
+
+
+def test_run_ablations_produces_csv() -> None:
+    """run_ablations should produce a valid ablation_results.csv."""
+    run_ablations(fleet_size=10, runs=2, master_seed=42, min_runs=100)
+    assert Path("ablation_results.csv").exists()
+    df = __import__("pandas").read_csv("ablation_results.csv")
+    assert len(df) == 3

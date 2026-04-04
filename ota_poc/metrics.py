@@ -30,6 +30,7 @@ from ota_poc.config import (
     CI_Z_SCORE,
     CONVERGENCE_THRESHOLD,
     CONVERGENCE_WINDOW,
+    COST_PER_COMPROMISED_ECU_USD,
     DEFAULT_FLEET_SIZE,
     DEFAULT_RUNS,
     DEFAULT_SEED,
@@ -105,6 +106,8 @@ def _compute_rollback_rate(fleet: list[Any], policy: str, rng: random.Random) ->
     Uses per-policy stochastic failure probabilities to model real-world
     rollback reliability differences (dual-partition, Uptane verification, etc.).
 
+    Uses dry_run=True to avoid mutating fleet state during metric collection.
+
     Args:
         fleet: List of ECU objects.
         policy: Policy identifier for failure probability lookup.
@@ -117,8 +120,25 @@ def _compute_rollback_rate(fleet: list[Any], policy: str, rng: random.Random) ->
     if not compromised:
         return 100.0
     failure_prob = _ROLLBACK_FAILURE_PROBS.get(policy, P0_ROLLBACK_FAILURE_PROB)
-    successes = sum(1 for ecu in compromised if ecu.rollback(rng, failure_prob))
-    return successes / len(compromised) * 100
+    eligible = sum(
+        1 for ecu in compromised if ecu.rollback(rng, failure_prob, dry_run=True)
+    )
+    return eligible / len(compromised) * 100
+
+
+def compute_economic_impact(e_impact: float) -> str:
+    """Compute estimated economic impact of a blast radius.
+
+    Args:
+        e_impact: Expected number of compromised endpoints.
+
+    Returns:
+        Human-readable cost string (e.g. '$33.3M').
+    """
+    cost = e_impact * COST_PER_COMPROMISED_ECU_USD
+    if cost >= 1_000_000:
+        return f"${cost / 1_000_000:.1f}M"
+    return f"${cost:,.0f}"
 
 
 def _compute_confidence_interval(values: list[float]) -> tuple[float, float]:
@@ -207,6 +227,9 @@ def run_scenarios(
                 "P95 Impact | Success": round(pd.Series(impacts).quantile(0.95)),
                 "Rollback Safety %": round(pd.Series(rollback_rates).mean(), 1),
                 "E[Impact] 95% CI": f"[{ci_lower}, {ci_upper}]",
+                "Est. Cost (USD)": compute_economic_impact(
+                    float(pd.Series(impacts).mean())
+                ),
             }
         )
 
@@ -337,6 +360,9 @@ def run_ablations(
                 "P95 Impact | Success": round(pd.Series(impacts).quantile(0.95)),
                 "Rollback Safety %": round(pd.Series(rollback_rates).mean(), 1),
                 "E[Impact] 95% CI": f"[{ci_lower}, {ci_upper}]",
+                "Est. Cost (USD)": compute_economic_impact(
+                    float(pd.Series(impacts).mean())
+                ),
             }
         )
 
