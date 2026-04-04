@@ -12,8 +12,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,10 +22,11 @@ import pandas as pd
 from tqdm import tqdm
 
 from ota_poc.config import (
-    CANARY_BETA_ALPHA,
-    CANARY_BETA_BETA,
+    CDF_ALPHA,
     CDF_BINS,
     CDF_DPI,
+    CDF_LINEWIDTH,
+    CI_Z_SCORE,
     CONVERGENCE_THRESHOLD,
     CONVERGENCE_WINDOW,
     DEFAULT_FLEET_SIZE,
@@ -32,6 +34,7 @@ from ota_poc.config import (
     DEFAULT_SEED,
     MAX_SIMULATION_HOURS,
     MIN_RUNS_FOR_CONVERGENCE,
+    PLOT_FIGSIZE,
 )
 from ota_poc.simulator import OTASimulator
 
@@ -67,7 +70,7 @@ def check_convergence(
     return bool(abs(recent - prior) / prior < threshold)
 
 
-def _compute_bypass_pct(fleet: list, artifact: dict[str, Any]) -> float:
+def _compute_bypass_pct(fleet: list[Any], artifact: dict[str, Any]) -> float:
     """Compute the percentage of deployed ECUs that were compromised.
 
     Args:
@@ -88,8 +91,22 @@ def _compute_bypass_pct(fleet: list, artifact: dict[str, Any]) -> float:
     return len(compromised) / total_deployed * 100
 
 
-def _compute_rollback_rate(fleet: list) -> float:
+def _can_rollback(ecu: Any) -> bool:
+    """Check if an ECU can be safely rolled back without mutating state.
+
+    Args:
+        ecu: An ECU object.
+
+    Returns:
+        True if the ECU is degraded and has a valid last known good version.
+    """
+    return ecu.status == "degraded" and bool(ecu.last_known_good_version)
+
+
+def _compute_rollback_rate(fleet: list[Any]) -> float:
     """Compute the percentage of compromised ECUs that can be safely rolled back.
+
+    This function does NOT mutate ECU state — it only checks eligibility.
 
     Args:
         fleet: List of ECU objects.
@@ -100,8 +117,8 @@ def _compute_rollback_rate(fleet: list) -> float:
     compromised = [ecu for ecu in fleet if ecu.compromised]
     if not compromised:
         return 100.0
-    attempted_rollbacks = sum(1 for ecu in compromised if ecu.rollback())
-    return attempted_rollbacks / len(compromised) * 100
+    can_rollback = sum(1 for ecu in compromised if _can_rollback(ecu))
+    return can_rollback / len(compromised) * 100
 
 
 def _compute_confidence_interval(values: list[float]) -> tuple[float, float]:
@@ -118,7 +135,7 @@ def _compute_confidence_interval(values: list[float]) -> tuple[float, float]:
         return (float(mean_val), float(mean_val))
     mean_val = float(np.mean(values))
     std_err = float(np.std(values, ddof=1) / np.sqrt(len(values)))
-    margin = 1.96 * std_err
+    margin = CI_Z_SCORE * std_err
     return (float(round(mean_val - margin, 1)), float(round(mean_val + margin, 1)))
 
 
@@ -145,7 +162,7 @@ def run_scenarios(
         f"master_seed={master_seed})..."
     )
 
-    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+    _, axes = plt.subplots(1, 2, figsize=PLOT_FIGSIZE)
 
     all_impacts: dict[str, list[float]] = {}
 
@@ -199,8 +216,8 @@ def run_scenarios(
             cumulative=True,
             label=policy,
             histtype="step",
-            alpha=0.9,
-            linewidth=2,
+            alpha=CDF_ALPHA,
+            linewidth=CDF_LINEWIDTH,
             bins=CDF_BINS,
         )
 

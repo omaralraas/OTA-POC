@@ -15,14 +15,13 @@ import random
 
 import pytest
 
-from ota_poc.simulator import ECU, OTASimulator, EventLog
 from ota_poc.config import (
     P0_CONTAINMENT_DELAY_HOURS,
     P0_ROLLOUT_HOURS,
     P2_CANARY_PHASE_HOURS,
     P2_POST_CANARY_ROLLOUT_HOURS,
 )
-
+from ota_poc.simulator import ECU, EventLog, OTASimulator
 
 POLICIES = ["P0_Minimal", "P1_Secure_OTA", "P2_Layered_Fleet"]
 

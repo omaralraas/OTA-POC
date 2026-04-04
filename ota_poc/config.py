@@ -49,6 +49,11 @@ CONVERGENCE_THRESHOLD: float = 0.02
 # --- Visualization ---
 CDF_BINS: int = 30
 CDF_DPI: int = 300
+CDF_ALPHA: float = 0.9
+CDF_LINEWIDTH: int = 2
+PLOT_FIGSIZE: tuple[int, int] = (16, 6)
+CI_Z_SCORE: float = 1.96
 
 # --- Simulation ---
 MAX_SIMULATION_HOURS: int = 144
+DEFAULT_VERSION: str = "v1.0"

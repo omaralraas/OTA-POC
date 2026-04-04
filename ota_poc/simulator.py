@@ -14,6 +14,9 @@ from typing import Any
 from ota_poc.config import (
     CANARY_BETA_ALPHA,
     CANARY_BETA_BETA,
+    DEFAULT_VERSION,
+    DETECTION_SCALING_FACTOR,
+    MAX_SIMULATION_HOURS,
     P0_CONTAINMENT_DELAY_HOURS,
     P0_DETECTION_PROB,
     P0_PREINSTALL_DETECTION,
@@ -26,7 +29,6 @@ from ota_poc.config import (
     P2_DETECTION_PROB,
     P2_POST_CANARY_ROLLOUT_HOURS,
     P2_PREINSTALL_DETECTION,
-    DETECTION_SCALING_FACTOR,
 )
 
 
@@ -34,6 +36,11 @@ class EventLog:
     """Structured event log aligned with Appendix B schema from the research paper."""
 
     def __init__(self, campaign_id: str = "CAMPAIGN_001") -> None:
+        """Initialize the event log.
+
+        Args:
+            campaign_id: Unique identifier for the OTA campaign.
+        """
         self.logs: list[dict[str, Any]] = []
         self.campaign_id = campaign_id
 
@@ -59,12 +66,12 @@ class EventLog:
             "component_id": details.get("component_id", "ECU_GENERIC"),
             "campaign_id": self.campaign_id,
             "version": version,
-            "metadata_valid": details.get("metadata_valid", None),
-            "artifact_hash_ok": details.get("hash_ok", None),
-            "install_result": details.get("install_result", None),
-            "boot_result": details.get("boot_result", None),
+            "metadata_valid": details.get("metadata_valid"),
+            "artifact_hash_ok": details.get("hash_ok"),
+            "install_result": details.get("install_result"),
+            "boot_result": details.get("boot_result"),
             "rollback_invoked": details.get("rollback_invoked", False),
-            "rollback_result": details.get("rollback_result", None),
+            "rollback_result": details.get("rollback_result"),
             "detection_flags": details.get("detection_flags", []),
         }
         extra = {k: v for k, v in details.items() if k not in entry}
@@ -76,10 +83,16 @@ class ECU:
     """Simulates a single Electronic Control Unit in the fleet."""
 
     def __init__(self, ecu_id: str, event_log: EventLog) -> None:
+        """Initialize an ECU with default state.
+
+        Args:
+            ecu_id: Unique identifier for this ECU.
+            event_log: Shared event log instance.
+        """
         self.ecu_id = ecu_id
-        self.active_version = "v1.0"
+        self.active_version = DEFAULT_VERSION
         self.standby_version = ""
-        self.last_known_good_version = "v1.0"
+        self.last_known_good_version = DEFAULT_VERSION
         self.event_log = event_log
         self.monotonic_counter = 1
         self.status = "healthy"
@@ -106,20 +119,21 @@ class ECU:
         hash_ok = artifact.get("hash_ok", True)
         metadata_valid = artifact.get("metadata_valid", True)
 
-        if policy in ("P1_Secure_OTA", "P2_Layered_Fleet"):
-            if not hash_ok or not metadata_valid:
-                self.event_log.log(
-                    "VERIFY_FAIL",
-                    self.ecu_id,
-                    artifact["version"],
-                    {
-                        "hash_ok": hash_ok,
-                        "metadata_valid": metadata_valid,
-                        "install_result": "blocked",
-                        "detection_flags": ["crypto_verify_fail"],
-                    },
-                )
-                return False
+        if policy in ("P1_Secure_OTA", "P2_Layered_Fleet") and (
+            not hash_ok or not metadata_valid
+        ):
+            self.event_log.log(
+                "VERIFY_FAIL",
+                self.ecu_id,
+                artifact["version"],
+                {
+                    "hash_ok": hash_ok,
+                    "metadata_valid": metadata_valid,
+                    "install_result": "blocked",
+                    "detection_flags": ["crypto_verify_fail"],
+                },
+            )
+            return False
 
         preinstall_detection = {
             "P0_Minimal": P0_PREINSTALL_DETECTION,
@@ -127,20 +141,19 @@ class ECU:
             "P2_Layered_Fleet": P2_PREINSTALL_DETECTION,
         }.get(policy, 0.0)
 
-        if artifact.get("unsafe_payload", False):
-            if rng.random() < preinstall_detection:
-                self.event_log.log(
-                    "VERIFY_FAIL",
-                    self.ecu_id,
-                    artifact["version"],
-                    {
-                        "install_result": "blocked",
-                        "detection_flags": ["pre_install_anomaly_detected"],
-                        "metadata_valid": metadata_valid,
-                        "hash_ok": hash_ok,
-                    },
-                )
-                return False
+        if artifact.get("unsafe_payload", False) and rng.random() < preinstall_detection:
+            self.event_log.log(
+                "VERIFY_FAIL",
+                self.ecu_id,
+                artifact["version"],
+                {
+                    "install_result": "blocked",
+                    "detection_flags": ["pre_install_anomaly_detected"],
+                    "metadata_valid": metadata_valid,
+                    "hash_ok": hash_ok,
+                },
+            )
+            return False
 
         self.event_log.log(
             "VERIFY_SUCCESS",
@@ -222,9 +235,22 @@ class OTASimulator:
         override_monitoring: bool = True,
         containment_delay_override: int | None = None,
     ) -> None:
+        """Initialize the simulator.
+
+        Args:
+            fleet_size: Number of ECUs in the fleet.
+            policy: Policy identifier (P0_Minimal, P1_Secure_OTA, P2_Layered_Fleet).
+            seed: Random seed for reproducibility.
+            override_staging: If False, disable staged rollout.
+            override_monitoring: If False, disable enhanced monitoring.
+            containment_delay_override: Override containment delay in hours.
+        """
         self.fleet_size = fleet_size
         self.policy = policy
-        self.rng = random.Random(seed)
+        # Instance-level RNG seeded per iteration for reproducibility.
+        # Using random.Random (not secrets) is intentional — this is a
+        # Monte Carlo simulation, not a cryptographic application.
+        self.rng = random.Random(seed)  # nosec B311
         self.override_staging = override_staging
         self.override_monitoring = override_monitoring
         self.containment_delay_override = containment_delay_override
@@ -255,13 +281,13 @@ class OTASimulator:
 
         if effective_policy in ("P0_Minimal", "P1_Secure_OTA"):
             return min(1.0, time_hour / P0_ROLLOUT_HOURS)
-        else:
-            if time_hour < P2_CANARY_PHASE_HOURS:
-                return self.canary_fraction
-            return min(
-                1.0,
-                self.canary_fraction + (time_hour - P2_CANARY_PHASE_HOURS) / P2_POST_CANARY_ROLLOUT_HOURS,
-            )
+        if time_hour < P2_CANARY_PHASE_HOURS:
+            return self.canary_fraction
+        remaining = time_hour - P2_CANARY_PHASE_HOURS
+        return min(
+            1.0,
+            self.canary_fraction + remaining / P2_POST_CANARY_ROLLOUT_HOURS,
+        )
 
     def get_detection_probability(self, policy: str) -> float:
         """Return per-hour base detection probability for a policy.
@@ -289,13 +315,17 @@ class OTASimulator:
             return
 
         detection_prob = self.get_detection_probability(self.policy)
-        chance = 1.0 - ((1.0 - detection_prob) ** (self._compromised_count / DETECTION_SCALING_FACTOR))
+        base = 1.0 - detection_prob
+        exponent = self._compromised_count / DETECTION_SCALING_FACTOR
+        chance = 1.0 - (base ** exponent)
         if self.rng.random() < chance:
             self.detection_time = hour
             if self.containment_delay_override is not None:
                 containment_delay = self.containment_delay_override
-            elif self.policy in ("P0_Minimal", "P1_Secure_OTA"):
+            elif self.policy == "P0_Minimal":
                 containment_delay = P0_CONTAINMENT_DELAY_HOURS
+            elif self.policy == "P1_Secure_OTA":
+                containment_delay = P1_CONTAINMENT_DELAY_HOURS
             else:
                 containment_delay = P2_CONTAINMENT_DELAY_HOURS
             self.contained_at = hour + containment_delay
@@ -340,17 +370,15 @@ class OTASimulator:
         for idx in unupdated[:to_deploy]:
             ecu = self.fleet[idx]
             was_compromised = ecu.compromised
-            was_deployed = ecu.active_version == artifact["version"]
             ecu.execute_ota(artifact, self.policy, self.rng)
             if ecu.compromised and not was_compromised:
                 self._compromised_count += 1
-            if ecu.active_version == artifact["version"] and not was_deployed:
-                self._deployed_count += 1
+            self._deployed_count += 1
 
     def run_simulation(
         self,
         artifact: dict[str, Any],
-        max_hours: int = 144,
+        max_hours: int = MAX_SIMULATION_HOURS,
     ) -> dict[str, Any]:
         """Run the full OTA compromise simulation.
 

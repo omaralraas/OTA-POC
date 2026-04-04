@@ -24,6 +24,18 @@ def main() -> None:
     print("simulation_metrics.csv OK")
 
     abl = pd.read_csv("ablation_results.csv")
+    abl_required = {
+        "Ablation",
+        "Bypass %",
+        "Median TTD (h)",
+        "E[Impact] (50k)",
+        "P95 Impact | Success",
+        "Rollback Safety %",
+    }
+    abl_missing = abl_required - set(abl.columns)
+    if abl_missing:
+        print(f"Missing columns in ablation_results.csv: {abl_missing}", file=sys.stderr)
+        sys.exit(1)
     print("ablation_results.csv OK")
 
 

@@ -2,15 +2,13 @@
 tests/test_ablation.py — Unit tests for the ablation study logic.
 """
 
-import os
-
-import pytest
+from pathlib import Path
 
 from ota_poc.metrics import run_ablations
 from ota_poc.simulator import OTASimulator
 
 
-def make_artifact() -> dict:
+def make_artifact() -> dict[str, bool | str]:
     """Create a test artifact for ablation studies.
 
     Returns:
@@ -73,11 +71,9 @@ def test_ablation_runner_completes() -> None:
     """run_ablations() should complete without raising exceptions."""
     run_ablations(fleet_size=200, runs=5, master_seed=42, min_runs=5)
 
-    assert os.path.exists("ablation_results.csv"), (
-        "ablation_results.csv should be saved."
-    )
-    if os.path.exists("ablation_results.csv"):
-        os.remove("ablation_results.csv")
+    csv_path = Path("ablation_results.csv")
+    assert csv_path.exists(), "ablation_results.csv should be saved."
+    csv_path.unlink()
 
 
 def test_ablation_slow_containment_higher_impact() -> None:
