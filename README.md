@@ -1,125 +1,152 @@
 # Proof of Concept: OTA Update Channel Compromise Risk
 
 [![CI](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml/badge.svg)](https://github.com/omaralraas/OTA-POC/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-This directory contains the executable Proof of Concept (PoC) for the academic research paper:
+This repository contains the executable Proof of Concept (PoC) for the academic research paper:
 
-## Repository Metadata
-*Note for repo owner: Please set the following GitHub topics for this repository: `ota-security`, `automotive-cybersecurity`, `monte-carlo-simulation`, `uptane`, `iso-sae-21434`, `unece-r155`, `python`, `smart-mobility`.*
-
-> *"Measuring OTA Update-Channel Compromise Risk in Smart Mobility Ecosystems:
-> A Safe Testbed and Governance to Engineering Controls."*
+> *"Measuring OTA Update-Channel Compromise Risk in Smart Mobility Ecosystems: A Safe Testbed and Governance to Engineering Controls."*
 > **Omar Alraas & Mohammad Thabet** — Canadian University Dubai, 2025.
 
 It implements a non-actionable, reproducible Monte Carlo simulation demonstrating how fleet-scale cryptographic engineering controls (P1) compare to Layered Fleet Governance (P2).
 
-## Prerequisites
-Before running the simulation, ensure the statistical visualization libraries are installed:
-```powershell
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Understanding the Policies](#understanding-the-policies)
+- [Running the Simulation](#running-the-simulation)
+- [Validating Results](#validating-results)
+- [Alternative Scenarios](#alternative-scenarios)
+- [Running Tests](#running-tests)
+- [Development](#development)
+- [Paper Citation](#paper-citation)
+- [Future Work](#future-work)
+
+## Quick Start
+
+```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Quick smoke test (10 runs, 1000 ECUs)
+python -m ota_poc.metrics --runs 10 --fleet-size 1000
+
+# Full simulation (500 runs, 50,000 ECUs)
+python -m ota_poc.metrics --runs 500 --fleet-size 50000 --seed 42
+
+# With ablation study
+python -m ota_poc.metrics --runs 500 --fleet-size 50000 --seed 42 --ablation
 ```
 
----
+## Architecture
 
-## Step 1: Run the Core Monte Carlo Simulation
-
-**Command to run:**
-```powershell
-python generate_metrics.py --runs 500 --fleet-size 50000 --seed 42
+```
+ota_poc/
+├── config.py      # Centralized simulation parameters
+├── simulator.py   # Core engine: ECU, EventLog, OTASimulator
+└── metrics.py     # Scenario runner, ablation studies, visualization
 ```
 
-For a quick smoke test:
-```powershell
-python generate_metrics.py --runs 10 --fleet-size 1000
+The simulation models three OTA rollout policies against a "Policy-Violating Signing Attack" — where a properly signed but unsafe configuration is pushed to the fleet. Instead of breaking cryptography, it measures how governance controls limit blast radius.
+
+## Understanding the Policies
+
+| Policy | Name | Description |
+|--------|------|-------------|
+| **P0** | Minimal Governance | Rapid rollout, weak telemetry, no staging |
+| **P1** | Secure OTA | Cryptographic verification but no governance controls |
+| **P2** | Layered Fleet | Staged 1% canary + transparency monitoring + incident response |
+
+## Running the Simulation
+
+### Full Monte Carlo Run
+
+```bash
+python -m ota_poc.metrics --runs 500 --fleet-size 50000 --seed 42
 ```
 
-### What is this step showcasing?
-This script executes up to **500 stochastic iterations** (with adaptive P95 convergence stopping)
-modeling a fleet of **50,000 Electric Control Units (ECUs)**.
-Instead of testing how an attacker might theoretically break AES or ECDSA (which the paper assumes
-is secure), it injects a "Policy-Violating Signing Attack" — a scenario where an insider threat or
-supply-chain compromise pushes a *properly signed* but *unsafe* configuration file to the fleet.
+This executes up to **500 stochastic iterations** (with adaptive P95 convergence stopping) modeling a fleet of **50,000 ECUs**.
 
-### What does this prove?
-This directly proves the central hypothesis of Table III from the research:
-1. **P0 (Minimal Governance)**: A rapid rollout with weak telemetry detects the incident too
-   slowly. The blast radius compromises ~28,000 endpoint vehicles before containment.
-2. **P1 (Secure OTA without Governance)**: Cryptography correctly verifies the *signature*, but
-   since the signed artifact is malicious, the vehicle updates successfully anyway. The blast radius
-   remains catastrophically high.
-3. **P2 (Layered Fleet)**: By combining cryptographic verification with a **staged 1% canary
-   rollout**, transparency monitoring, and an Incident Response playbook, the anomaly is detected
-   while limited to the initial rollout cohort. In Monte Carlo results (50,000-ECU fleet,
-   500 iterations), the **median blast radius is ~2,112 endpoints** and the
-   **P95 worst-case is ~6,828 endpoints** — an 86% reduction relative to P1's worst-case under
-   the same compromise scenario. The 1% staging gate is the primary constraint; detection speed
-   and containment time determine the remainder. See `simulation_metrics.csv` and
-   `blast_radius_cdf.png` for the full distribution.
+### What This Proves
 
----
+1. **P0 (Minimal Governance)**: Rapid rollout with weak telemetry detects the incident too slowly. Blast radius compromises ~28,000 endpoints before containment.
+2. **P1 (Secure OTA without Governance)**: Cryptography verifies the signature, but since the signed artifact is malicious, vehicles update successfully anyway. Blast radius remains catastrophically high.
+3. **P2 (Layered Fleet)**: Staged 1% canary rollout + transparency monitoring + incident response detects the anomaly while limited to the initial cohort. **Median blast radius ~2,112 endpoints**, **P95 worst-case ~6,828 endpoints** — an 86% reduction relative to P1.
 
-## Step 2: Validate the Metrics and Event Logs
+## Validating Results
 
-After the script finishes, it generates the following outputs.
+After the script finishes, it generates:
 
-### 1. `simulation_metrics.csv`
-Contains all columns from Table III: **Bypass %**, Median TTD, P95 TTD, E[Impact],
-P95 Impact | Success, **Rollback Safety %**. Copy-paste directly into the research appendix.
+### `simulation_metrics.csv`
+Contains all columns from Table III: **Bypass %**, Median TTD, P95 TTD, E[Impact], P95 Impact | Success, **Rollback Safety %**, and **95% CI**.
 
-### 2. Event Log Files (e.g., `P2_Layered_Fleet_sample_event_log.json`)
-Open these JSON files to inspect the simulated lifecycle of an OTA update.
-The telemetry structures map to all fields in Appendix B (Event Log Schema): `component_id`,
-`campaign_id`, `metadata_valid`, `artifact_hash_ok`, `install_result`, `boot_result`,
-`rollback_invoked`, `rollback_result`, `detection_flags` — with ISO-8601 UTC timestamps.
+### Event Log Files
+JSON files (e.g., `P2_Layered_Fleet_sample_event_log.json`) with Appendix B compliant schema: `component_id`, `campaign_id`, `metadata_valid`, `artifact_hash_ok`, `install_result`, `boot_result`, `rollback_invoked`, `rollback_result`, `detection_flags` — with ISO-8601 UTC timestamps.
 
-### 3. `blast_radius_cdf.png`
-A data-science-grade CDF chart showing three clearly separated curves (P0, P1, P2),
-providing empirical backing that metrics hold true across statistical variance, not just
-single algebraic hypotheses.
+### `blast_radius_cdf.png`
+CDF chart with box plot showing three clearly separated curves (P0, P1, P2).
 
-### 4. `ablation_results.csv` (optional)
-Run with `--ablation` to also produce Table IV reproductions:
-```powershell
-python generate_metrics.py --runs 500 --ablation
+### `ablation_results.csv`
+Run with `--ablation` to produce Table IV reproductions:
+
+```bash
+python -m ota_poc.metrics --runs 500 --ablation
 ```
 
----
+## Alternative Scenarios
 
-## Step 3: Tweak Variables to Demonstrate Alternative Scenarios (For Reviewers)
-
-Open `generate_metrics.py` in your code editor and locate the `malicious_artifact` dict
-(around **line 55**):
+Modify the `MALICIOUS_ARTIFACT` constant in `ota_poc/metrics.py`:
 
 ```python
-malicious_artifact = {
-    "version":        "v1.1_malicious",
-    "hash_ok":        True,   # Crypto controls bypassed/intact
-    "metadata_valid": True,   # Authorised keys used (Key Control Threat)
-    "unsafe_payload": True,   # Introduces fleet-wide degradation
+MALICIOUS_ARTIFACT = {
+    "version": "v1.1_malicious",
+    "hash_ok": True,        # Set False to test supply chain path failure
+    "metadata_valid": True,
+    "unsafe_payload": True,
 }
 ```
 
-### Showcase alternative Failure Modes:
-* **Supply Chain Path Failure**: Set `"hash_ok": False`. P1 and P2 drop to exactly `0` impact —
-  blocked by cryptography alone.
-* **Rollback Constraints**: In `ota_simulator.py` the `ECU.rollback()` method restores to
-  `last_known_good_version`, dynamically tracked per ECU, modelling the A/B partition safety
-  mechanism described in the paper.
-* **Ablation Studies**: Pass `--ablation` to reproduce Table IV (no staging / no monitoring /
-  slow containment variants).
-
----
+- **Supply Chain Path Failure**: Set `"hash_ok": False`. P1 and P2 drop to exactly `0` impact — blocked by cryptography alone.
+- **Ablation Studies**: Pass `--ablation` for no staging / no monitoring / slow containment variants.
 
 ## Running Tests
 
-```powershell
-pytest tests/ -v
+```bash
+pip install -r requirements-dev.txt
+pytest tests/ -v --cov=ota_poc --cov-report=term-missing
 ```
 
-Tests cover: healthy update lifecycle, hash-failure blocking (P1/P2), rollback LKG restore,
-P2 ≤ P0 blast radius ordering, seed reproducibility, and Appendix B schema compliance.
+Tests cover: healthy update lifecycle, hash-failure blocking (P1/P2), rollback LKG restore, P2 ≤ P0 blast radius ordering, seed reproducibility, convergence detection, CLI input validation, and Appendix B schema compliance.
 
----
+## Development
+
+### Setup
+
+```bash
+# Install with dev dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+# Or use pip install -e . for editable install
+pip install -e ".[dev]"
+```
+
+### Code Quality
+
+```bash
+ruff check ota_poc/ tests/ scripts/
+mypy ota_poc/ scripts/
+bandit -r ota_poc/ -ll
+```
+
+### Docker
+
+```bash
+docker build -t ota-poc .
+docker run ota-poc --runs 10 --fleet-size 1000
+```
 
 ## Paper Citation
 
@@ -129,14 +156,12 @@ Mobility Ecosystems: A Safe Testbed and Governance to Engineering Controls,"
 Canadian University Dubai, 2025.
 ```
 
----
+## Future Work
 
-## Future Work & Extensibility
-
-This Proof of Concept currently implements a static policy-violating signing scenario. Future enhancements to the testbed may include:
-
-- **Network-Level Adversaries**: Incorporating probability models for Wi-Fi/Cellular interception prior to the OTA gateway.
-- **Dynamic Policy Switching**: Allowing the simulator to upgrade its policy (e.g., P1 to P2) mid-fleet rollout.
-- **Hardware-in-the-Loop (HIL) Integration**: Migrating the `ECU` class to interface with physical CAN bus hardware for hybrid simulations.
+- **Network-Level Adversaries**: Probability models for Wi-Fi/Cellular interception
+- **Dynamic Policy Switching**: Upgrade policy (P1 to P2) mid-fleet rollout
+- **Hardware-in-the-Loop (HIL)**: Interface with physical CAN bus hardware
+- **ECU Heterogeneity**: Different hardware generations and connectivity profiles
+- **Cost Model**: Economic impact simulation of different blast radii
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.

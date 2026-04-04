@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ota-poc"
+version = "1.0.0"
+description = "Monte Carlo simulation of OTA update-channel compromise risk in smart mobility ecosystems"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Omar Alraas", email = "omar.alraas@cud.ac.ae"},
+    {name = "Mohammad Thabet"},
+    {name = "Lobna AbuSerrieh"},
+]
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+    "bandit>=1.7.0",
+]
+
+[project.scripts]
+ota-poc = "ota_poc.metrics:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]

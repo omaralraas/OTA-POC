@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v4
@@ -20,30 +20,35 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest
+        pip install -r requirements-dev.txt
 
-    - name: Run unit tests
-      run: pytest tests/ -v
+    - name: Lint with ruff
+      run: ruff check ota_poc/ tests/ scripts/
+
+    - name: Type check with mypy
+      run: mypy ota_poc/ scripts/
+
+    - name: Security scan with bandit
+      run: bandit -r ota_poc/ -ll
+
+    - name: Run tests with coverage
+      run: pytest tests/ -v --cov=ota_poc --cov-report=xml --cov-fail-under=90
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      if: matrix.python-version == '3.12'
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
 
     - name: Run smoke simulation (small fleet)
-      run: python generate_metrics.py --runs 10 --fleet-size 1000 --ablation
+      run: python -m ota_poc.metrics --runs 10 --fleet-size 1000 --ablation
 
     - name: Assert output CSVs
-      run: |
-        cat << 'EOF' > assert_csvs.py
-        import pandas as pd, sys
-        df = pd.read_csv('simulation_metrics.csv')
-        required = {'Policy','Bypass %','Median TTD (h)','P95 TTD (h)',
-                    'E[Impact]','P95 Impact | Success','Rollback Safety %'}
-        missing = required - set(df.columns)
-        if missing: sys.exit(f'Missing columns: {missing}')
-        print('simulation_metrics.csv OK')
-        abl = pd.read_csv('ablation_results.csv')
-        print('ablation_results.csv OK')
-        EOF
-        python assert_csvs.py
+      run: python scripts/assert_csvs.py
