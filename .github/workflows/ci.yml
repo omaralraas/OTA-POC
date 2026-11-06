@@ -45,13 +45,6 @@ jobs:
     - name: Run tests with coverage
       run: pytest tests/ -v --cov=ota_poc --cov-report=xml --cov-fail-under=90
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      if: matrix.python-version == '3.12'
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: false
-
     - name: Run smoke simulation (small fleet)
       if: matrix.python-version == '3.12'
       run: python -m ota_poc.metrics --runs 10 --fleet-size 1000 --ablation
