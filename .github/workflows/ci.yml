@@ -11,8 +11,11 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # actions/python-versions has no Python 3.9 build for Ubuntu 26.04 (ubuntu-latest),
+    # so the 3.9 leg runs on ubuntu-24.04, which has one (22.04 does too, but it retires 2027-04-17).
+    runs-on: ${{ matrix.python-version == '3.9' && 'ubuntu-24.04' || 'ubuntu-latest' }}
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
@@ -41,13 +44,6 @@ jobs:
 
     - name: Run tests with coverage
       run: pytest tests/ -v --cov=ota_poc --cov-report=xml --cov-fail-under=90
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      if: matrix.python-version == '3.12'
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: false
 
     - name: Run smoke simulation (small fleet)
       if: matrix.python-version == '3.12'
