@@ -7,7 +7,7 @@ name = "ota-poc"
 version = "1.0.0"
 description = "Monte Carlo simulation of OTA update-channel compromise risk in smart mobility ecosystems"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Omar Alraas", email = "20220001549@students.cud.ac.ae"},
     {name = "Mohammad Thabet"},
