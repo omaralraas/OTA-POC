@@ -7,7 +7,7 @@ name = "ota-poc"
 version = "1.0.0"
 description = "Monte Carlo simulation of OTA update-channel compromise risk in smart mobility ecosystems"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Omar Alraas", email = "20220001549@students.cud.ac.ae"},
     {name = "Mohammad Thabet"},
@@ -16,7 +16,7 @@ authors = [
 requires-python = ">=3.9"
 dependencies = [
     "pandas>=2.3.3",
-    "matplotlib>=3.7.0",
+    "matplotlib>=3.9.0",
     "tqdm>=4.65.0",
 ]
 
